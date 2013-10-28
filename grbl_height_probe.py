@@ -30,13 +30,14 @@ z_down = -1.0
 z_up = 0.0
 
 tic = 5.0
+epsilon = 0.005
 
 fn = None
 
 default_str = "x,X,y,Y,z_down,z_up,t = [" + str(x_start) + ", "+ str(x_end) + ", " + str(y_start) + ", " + str(y_end) + ", " + str(z_down) + ", " + str(z_up) + ", " + str(tic) + "]"
 
 
-parser = argparse.ArgumentParser(description= "Probe using GRBL's height probe functionality to find height of PCB.")
+parser = argparse.ArgumentParser(description= "Probe using GRBL's height probe functionality to find height of PCB, output to stdout.")
 parser.add_argument("-B", "--baud", help="Set baud rate (default 9600)", nargs = 1, default=[baud], type=int)
 parser.add_argument("-D", "--device", help="Set device (default /dev/ttyUSB0)", nargs = 1, default=[device] )
 parser.add_argument("-v", "--version", help="Show version", default=False, action='store_true')
@@ -51,6 +52,7 @@ parser.add_argument("-z", "--z_down", help="lower bound of where z probe can go 
 parser.add_argument("-Z", "--z_up", help="safe distance to retract z probe to (default 0)", nargs=1, default=[z_up] )
 parser.add_argument("-t", "--tic", help="delta length to move to (default 5mm)", nargs=1, default=[tic] )
 parser.add_argument("-f", "--file", help="file with the x,y co-ordinates for height mapping", nargs=1, default=[fn] )
+parser.add_argument("-e", "--epsilon", help="how far from desired position is close enough", nargs=1, defaul[epsilon] )
 
 args = parser.parse_args()
 
@@ -71,6 +73,7 @@ if hasattr(args, 'y_end'):      y_end = float(args.y_end[0])
 if hasattr(args, 'z_up'):       z_up = float(args.z_up[0])
 if hasattr(args, 'z_down'):     z_down = float(args.z_down[0])
 if hasattr(args, 'tic'):        tic = float(args.tic[0])
+if hasattr(args, 'epsilon'):    epsilon = float(args.epsilon[0])
 if hasattr(args, 'file'):       fn = args.file[0]
 
 if version_flag:
@@ -82,7 +85,8 @@ if verbose:
   print "# tic:", tic
 
 if not debug:
-  grbl.setup()
+  grbl.setup(device, baud)
+  grbl.var_epsilon = epsilon
 
 grid = []
 

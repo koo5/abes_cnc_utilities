@@ -23,7 +23,7 @@ device = "/dev/ttyUSB0"
 baud = 9600
 grbl_serial = None
 sleepy = 0.05            # seconds
-var_epsilon = 0.005
+var_epsilon = 0.005 #how far from desired position is close enough
 
 verbose = False
 #verbose = True
@@ -35,6 +35,7 @@ def setup( dev = device, b = baud ):
   device = dev
   baud = b
   grbl_serial = serial.Serial( device, baud )
+  send_command("\n") #dont expect ok upon connecting, it doesnt always come
 
 def teardown():
   global grbl_serial
@@ -47,7 +48,7 @@ def send_command( cmd ) :
   global grbl_serial
   global verbose
   if verbose:
-    print "# sending '" + cmd + "'"
+    print "# sending '" + cmd.encode('string_escape') + "'"
   grbl_serial.write(cmd + "\n")
   grbl_out = grbl_serial.readline()
 
